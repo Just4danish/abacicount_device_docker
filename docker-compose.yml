@@ -1,0 +1,104 @@
+version: "3.7"
+# run "docker-compose up" from terminal and thats it.
+# If the image is not getting updated, do the following
+# "docker system prune -a"
+# "docker volume prune -a"
+services:
+  redis:
+    image: redis:alpine
+    networks:
+      - front
+      - back
+    ports:
+      - "6389:6379"
+  rabbitmq:
+    image: rabbitmq
+    networks:
+      - front
+      - back
+    ports:
+      - "5675:5672"
+  abacicount:
+    build: ./
+    volumes:
+      - app:/app
+      - ./media:/app/media
+      - ./logs:/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - front
+      - back
+      - host
+    ports:
+      - 8500:8500
+    depends_on:
+      - redis
+      - rabbitmq
+    links:
+      - redis
+      - rabbitmq
+    environment:
+      - DJANGO_DEBUG=False
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=countab@ci321
+      - POSTGRES_PORT=5432
+      - REDIS_PORT=6379
+      - SECRET_KEY=r3gm+ldfgfit01#sdfge345fdfhgsfy54eq*wbbp#xqj31un4j^dfgdsg5=!^a7+h_x6v3jwn
+      - JWT_SECRET_KEY=wbbp#^5=!^a7+h_m+l%+(it01#s%eq*wbbp#xqj31un4j%+(it01#s%eq*wbbp#^5=!^a7+h_x6v3jwn
+      - PRODUCT_ACTIVATION_KEY=*4hx01#s%eq*wbbp#^5=!^a7+h_r3gm+l%+(it01#s%eq*wbbp#xqj31un4j%+(it01#s%eq*wbbp#^5=!^a7+h_x6v3jwn
+      - ALLOWED_HOSTS=[*]
+      - ABACI_SERVER_BASE_URL='https://admin.abacicount.com/'
+  cam_streamer:
+    build: ./cam_streamer
+    networks:
+      - front
+      - back
+      - host
+    ports:
+      - 9500:9500
+    depends_on:
+      - redis
+    links:
+      - redis
+    environment:
+      - DEBUG=False
+      - REDIS_PORT=6389
+  nginx:
+    build: ./nginx
+    volumes:
+      - app:/app
+      - ./media_outside_docker:/app/media
+    networks:
+      - front
+      - back
+    ports:
+      - 80:80
+    depends_on:
+      - abacicount
+      - cam_streamer
+    links:
+      - abacicount
+      - cam_streamer
+  postgres:
+    image: postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=countab@ci321
+    ports:
+      - "5435:5432"
+    networks:
+      - back
+networks:
+  front:
+  back:
+  host:
+volumes:
+  app:
+  postgres_data:
