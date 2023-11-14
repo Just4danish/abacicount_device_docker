@@ -51,6 +51,7 @@ services:
       - redis
       - rabbitmq
     environment:
+      - UNIQUE_ID=57375256829640
       - DJANGO_DEBUG=False
       - REDIS_HOST=redis
       - RABBITMQ_HOST=rabbitmq
