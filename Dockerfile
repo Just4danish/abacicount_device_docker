@@ -25,11 +25,9 @@ WORKDIR /app
 RUN GIT_SSH_COMMAND='ssh -i /root/.ssh/deploy_key' git clone -b latest_version git@github.com:Just4danish/abacicount_new.git .
 
 # Copy the requirements file and install Python dependencies
-COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entrypoint script and ensure it's executable
-COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
 # Set the entrypoint

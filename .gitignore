@@ -1,2 +1,3 @@
-postgres_data
-media
+postgres_data/
+media/
+*.zip
