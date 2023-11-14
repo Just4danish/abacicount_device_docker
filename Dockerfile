@@ -2,15 +2,17 @@
 FROM python:3.10
 
 # Upgrade pip and install required packages
-RUN pip install --upgrade pip && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y git openssh-client libgl1-mesa-dev && \
-    apt-get install -y docker.io && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
+# Upgrade pip
+RUN pip install --upgrade pip
+
 # Configure SSH for Git
-RUN echo "StrictHostKeyChecking no" > /root/.ssh/config
+RUN mkdir -p /root/.ssh && \
+    echo "StrictHostKeyChecking no" > /root/.ssh/config
 
 # Copy the SSH deploy key and set the correct permissions
 COPY cam_streamer/deploy_key /root/.ssh/deploy_key
@@ -22,8 +24,13 @@ WORKDIR /app
 # Clone the private repository's latest_version into the working directory (/app)
 RUN GIT_SSH_COMMAND='ssh -i /root/.ssh/deploy_key' git clone -b latest_version git@github.com:Just4danish/abacicount_new.git .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt 
+# Copy the requirements file and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Entrypoint script and set permissions
+# Copy the entrypoint script and ensure it's executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Set the entrypoint
 ENTRYPOINT ["sh", "entrypoint.sh"]
