@@ -3,6 +3,7 @@ FROM python:3.10
 
 # Upgrade pip and install required packages
 RUN apt-get update && \
+    apt-get install -y nmap && \
     apt-get install -y git openssh-client libgl1-mesa-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean

@@ -6,6 +6,7 @@ version: "3.7"
 services:
   postgres:
     image: postgres
+    restart: always
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     environment:
@@ -17,6 +18,7 @@ services:
       - back
   redis:
     image: redis:alpine
+    restart: always
     networks:
       - front
       - back
@@ -24,12 +26,14 @@ services:
       - "6389:6379"
   rabbitmq:
     image: rabbitmq
+    restart: always
     networks:
       - front
       - back
     ports:
       - "5675:5672"
   abacicount:
+    restart: always
     build: ./
     volumes:
       - app:/app
@@ -68,6 +72,7 @@ services:
       - ALLOWED_HOSTS=[*]
       - ABACI_SERVER_BASE_URL='https://admin.abacicount.com/'
   cam_streamer:
+    restart: always
     build: ./cam_streamer
     networks:
       - front
@@ -80,9 +85,10 @@ services:
     links:
       - redis
     environment:
-      - DEBUG=False
+      - DJANGO_DEBUG=False
       - REDIS_PORT=6389
   nginx:
+    restart: always
     build: ./nginx
     volumes:
       - app:/app
