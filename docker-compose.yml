@@ -85,8 +85,9 @@ services:
     links:
       - redis
     environment:
-      - DJANGO_DEBUG=False
-      - REDIS_PORT=6389
+      - DEBUG=False
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
   nginx:
     restart: always
     build: ./nginx
