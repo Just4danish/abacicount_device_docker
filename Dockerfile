@@ -23,7 +23,8 @@ RUN chmod 600 /root/.ssh/deploy_key
 WORKDIR /app
 
 # Clone the private repository's latest_version into the working directory (/app)
-RUN GIT_SSH_COMMAND='ssh -i /root/.ssh/deploy_key' git clone -b latest_version git@github.com:Just4danish/abacicount_new.git .
+RUN GIT_SSH_COMMAND='ssh -i /root/.ssh/deploy_key' git clone --single-branch -b latest_version git@github.com:Just4danish/abacicount_new.git .
+RUN git -C /app config branch.latest_version.merge refs/heads/latest_version
 
 # Copy the requirements file and install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
