@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 # run "docker-compose up" from terminal and thats it.
 # If the image is not getting updated, do the following
 # "docker system prune -a"
